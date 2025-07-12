@@ -1,7 +1,7 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "watchPatterns": ["application/**"],
-    "dockerfilePath": "docker/php/Dockerfile"
+    "dockerfilePath": "docker/php/Dockerfile",
+    "root": "application"
   }
 }
