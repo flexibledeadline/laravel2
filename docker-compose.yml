@@ -1,0 +1,51 @@
+networks:
+  marker-network:
+    driver: bridge
+
+services:
+  node:
+    image: node:23.6.1-alpine3.20
+    volumes:
+      - ./application:/app
+    working_dir: /app
+
+  composer:
+    image: composer:2
+    container_name: composer
+    working_dir: /var/www
+    volumes:
+    - ./application:/var/www
+    networks:
+      - marker-network
+  app:
+    build: docker/php
+    container_name: marker_app
+    working_dir: /var/www
+    volumes:
+      - ./application:/var/www
+    networks:
+      - marker-network
+
+  nginx:
+    image: nginx:latest
+    container_name: marker_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./application:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - marker-network
+
+  database:
+    image: mysql:8.0
+    container_name: marker_database
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./database:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - marker-network
